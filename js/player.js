@@ -1,1 +1,9 @@
-
+'use strict';
+'use strict';
+const W=105,L=68,STEP=0.05,formations={"4-3-3":[4,3,3],"4-4-2":[4,4,2],"4-2-3-1":[4,2,3,1],"3-5-2":[3,5,2],"5-3-2":[5,3,2],"4-1-4-1":[4,1,4,1],"3-4-3":[3,4,3]};
+const attrNames=['Pace','Acceleration','Stamina','Passing','Vision','First touch','Dribbling','Finishing','Long shots','Tackling','Marking','Positioning','Strength','Decisions','Composure','Goalkeeping'];const keys=['pace','acceleration','stamina','passing','vision','touch','dribbling','finishing','longshots','tackling','marking','positioning','strength','decisions','composure','goalkeeping'];
+const $=id=>document.getElementById(id);const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const avg=(xs)=>xs.reduce((a,b)=>a+b,0)/Math.max(1,xs.length);
+function seeded(s){let x=(Number(s)>>>0)||1;return()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296}};
+function mkPlayer(team,i,rng){let roles=['GK','RB','CB','CB','LB','DM','CM','CM','RW','ST','LW','AM','CB','CM','FB','WG','ST'];let role=roles[i],p={id:team*17+i,team,name:(team?'Orange ':'Blue ')+['Keeper','Mercer','Stone','Reed','Vale','Mason','Carter','Parker','Hayes','Taylor','Bennett','Brooks','Hunter','Cole','Wood','Adams','Wells'][i],num:i+1,role,active:i<11,fitness:1,x:0,y:0,tx:0,ty:0};keys.forEach(k=>p[k]=clamp(Math.round(63+rng()*22+(role==='GK'&&k==='goalkeeping'?13:0)-(role==='GK'&&['finishing','dribbling','tackling'].includes(k)?18:0)),1,99));if(role!=='GK')p.goalkeeping=clamp(Math.round(8+rng()*17),1,99);if(role==='ST'||role==='WG'||role==='RW'||role==='LW'){p.finishing=clamp(p.finishing+8,1,99);p.pace=clamp(p.pace+5,1,99)}if(['CB','RB','LB','FB'].includes(role)){p.tackling=clamp(p.tackling+9,1,99);p.marking=clamp(p.marking+7,1,99)}return p}
+function makeTeams(){let rng=seeded(4599);return [0,1].map(t=>({formation:t?'4-4-2':'4-3-3',style:'balanced',press:'medium',mentality:'balanced',subCount:0,players:Array.from({length:17},(_,i)=>mkPlayer(t,i,rng))}))}
+let teams=makeTeams(),selectedTeam=0,selectedId=0,sim=null,playing=false,accum=0,lastFrame=performance.now(),ballFx=null;
