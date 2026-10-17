@@ -1,0 +1,4 @@
+'use strict';
+function active(t){return teams[t].players.filter(p=>p.active)}function overall(p){let relevant=p.role==='GK'?['goalkeeping','positioning','composure','decisions']:['passing','touch','positioning','decisions','pace','stamina',...(p.role==='ST'?['finishing','finishing']:['tackling'])];return Math.round(avg(relevant.map(k=>p[k])))}
+function template(team){let lines=formations[teams[team].formation],spots=[{x:team?100:5,y:34,role:'GK'}];let depth=lines.length;lines.forEach((count,li)=>{let d=15+(li/(Math.max(1,depth-1)))*61;for(let j=0;j<count;j++)spots.push({x:team?105-d:d,y:(j+1)*68/(count+1),role:li===0?'DEF':li===depth-1?'ATT':'MID'})});return spots}
+function assignFormation(team,teleport=false){let players=active(team),spots=template(team);players.forEach((p,i)=>{if(!spots[i])return;p.baseX=spots[i].x;p.baseY=spots[i].y;if(teleport){p.x=p.baseX;p.y=p.baseY;p.tx=p.x;p.ty=p.y}})}
